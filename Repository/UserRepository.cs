@@ -1,5 +1,4 @@
-﻿using DemoProject1.API.JsonData;
-using DemoProject1.API.Model.Domain;
+﻿using DemoProject1.API.Model.Domain;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text.Json;
 using TestProject1.API.Model.DTO;
