@@ -12,6 +12,6 @@ namespace DemoProject1.API.Model.Domain
         public string? Email { get; set; }
         public string Specialization { get; set; }
         public bool IsEmployee { get; set; }
-        public int UserId { get; set; }
+        public int UserId { get; set; }       
     }
 }

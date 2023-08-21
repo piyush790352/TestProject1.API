@@ -13,26 +13,61 @@ namespace DemoProject1.API.Repository
         {
             return id++;
         }
-        public static async Task<Response<List<UserDetail>>> GetUserDetails()
+
+        public static async Task<Response<List<UserDetailDTO>>> GetUserDetails()
         {
             try
             {
-                string text = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserDetailList.json");
-                var userDetails = JsonSerializer.Deserialize<List<UserDetail>>(text);
-                if (userDetails.Count == 0)
+                string userList = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserList.json");
+                var users = JsonSerializer.Deserialize<List<User>>(userList);
+                if (users.Count == 0)
                 {
-                    return new Response<List<UserDetail>>
+                    return new Response<List<UserDetailDTO>>
                     {
                         StatusMessage = "No recored found!."
                     };
                 }
                 else
                 {
-                    return new Response<List<UserDetail>>
+                    string text = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserDetailList.json");
+                    var userDetails = JsonSerializer.Deserialize<List<UserDetail>>(text);
+                    if (userDetails.Count == 0)
                     {
-                        Result = userDetails,
-                        StatusMessage = "Ok"
-                    };
+                        return new Response<List<UserDetailDTO>>
+                        {
+                            StatusMessage = "No recored found!."
+                        };
+                    }
+                    else
+                    {
+                        var result = (from objuser in users
+                                      join objuserDetail in userDetails on objuser.UserId equals objuserDetail.UserId
+                                      select new UserDetailDTO()
+                                      {
+                                          UserName = objuser.UserName,
+                                          FirstName = objuserDetail.FirstName,
+                                          LastName = objuserDetail.LastName,
+                                          Email = objuserDetail.Email,
+                                          Gender = objuserDetail.Gender,
+                                          Specialization = objuserDetail.Specialization,
+                                          IsEmployee = objuserDetail.IsEmployee
+                                      }).ToList();
+                        if (result.Count > 0)
+                        {
+                            return new Response<List<UserDetailDTO>>
+                            {
+                                Result = result,
+                                StatusMessage = "Ok"
+                            };
+                        }
+                        else
+                        {
+                            return new Response<List<UserDetailDTO>>
+                            {
+                                StatusMessage = "No recored found!."
+                            };
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -41,27 +76,61 @@ namespace DemoProject1.API.Repository
             }
         }
 
-        public static async Task<Response<UserDetail>> GetUserDetailById(int Id)
+        public static async Task<Response<UserDetailDTO>> GetUserDetailById(int Id)
         {
             try
             {
-                string text = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserDetailList.json");
-                var userDetails = JsonSerializer.Deserialize<List<UserDetail>>(text);
-                var userResult = userDetails.FirstOrDefault(x => x.Id == Id);
-                if (userResult != null)
+                string userList = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserList.json");
+                var users = JsonSerializer.Deserialize<List<User>>(userList);
+                if (users.Count == 0)
                 {
-                    return new Response<UserDetail>
+                    return new Response<UserDetailDTO>
                     {
-                        Result = userResult,
-                        StatusMessage = "Ok"
+                        StatusMessage = "No recored found!."
                     };
                 }
                 else
                 {
-                    return new Response<UserDetail>
+                    string text = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserDetailList.json");
+                    var userDetails = JsonSerializer.Deserialize<List<UserDetail>>(text);
+                    var userResult = userDetails.FirstOrDefault(x => x.Id == Id);
+                    if (userResult != null)
                     {
-                        StatusMessage = "No record found.!"
-                    };
+                        var result = (from objuser in users
+                                      join objuserDetail in userDetails on objuser.UserId equals objuserDetail.UserId
+                                      select new UserDetailDTO()
+                                      {
+                                          UserName = objuser.UserName,
+                                          FirstName = objuserDetail.FirstName,
+                                          LastName = objuserDetail.LastName,
+                                          Email = objuserDetail.Email,
+                                          Gender = objuserDetail.Gender,
+                                          Specialization = objuserDetail.Specialization,
+                                          IsEmployee = objuserDetail.IsEmployee
+                                      }).FirstOrDefault();
+                        if (result != null)
+                        {
+                            return new Response<UserDetailDTO>
+                            {
+                                Result = result,
+                                StatusMessage = "Ok"
+                            };
+                        }
+                        else
+                        {
+                            return new Response<UserDetailDTO>
+                            {
+                                StatusMessage = "No recored found!."
+                            };
+                        }
+                    }
+                    else
+                    {
+                        return new Response<UserDetailDTO>
+                        {
+                            StatusMessage = "No record found.!"
+                        };
+                    }
                 }
 
             }
@@ -123,14 +192,7 @@ namespace DemoProject1.API.Repository
                                 StatusMessage = "No Record found..!"
                             };
                         }
-                    }
-                    else
-                    {
-                        return new Response<UserDetail>
-                        {
-                            StatusMessage = "UserId and Id must be same."
-                        };
-                    }
+                    }                    
                 }
                 return new Response<UserDetail>
                 {
