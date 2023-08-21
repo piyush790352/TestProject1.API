@@ -11,6 +11,6 @@ namespace TestProject1.API.Model.DTO
         public string Gender { get; set; }
         public string? Email { get; set; }
         public string Specialization { get; set; }
-        public bool IsEmployee { get; set; }       
+        public bool IsEmployee { get; set; }      
     }
 }

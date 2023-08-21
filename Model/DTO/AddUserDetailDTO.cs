@@ -23,7 +23,6 @@ namespace TestProject1.API.Model.DTO
         public string? Email { get; set; }
 
         [Required(ErrorMessage = "Specialization is required.")]
-        [RegularExpression("^[a-zA-Z]*$", ErrorMessage = "Only characters are allow.")]
         public string Specialization { get; set; }
         public bool IsEmployee { get; set; }
         public int UserId { get; set; }

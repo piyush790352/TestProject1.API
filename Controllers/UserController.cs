@@ -3,6 +3,7 @@ using DemoProject1.API.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestProject1.API.Model.DTO;
+using TestProject1.API.Service;
 
 namespace DemoProject1.API.Controllers
 {
@@ -17,7 +18,7 @@ namespace DemoProject1.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var response = await UserRepository.GetUserDetails();
+            var response = await UserDetailService.GetUserDetails();
             return Ok(response);
         }
 
@@ -28,7 +29,7 @@ namespace DemoProject1.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var response = await UserRepository.GetUserDetailById(Id);
+            var response = await UserDetailService.GetUserDetailById(Id);
             return Ok(response);
         }
 
@@ -39,7 +40,7 @@ namespace DemoProject1.API.Controllers
             {
                 return BadRequest("Invalid data. Please recheck!");
             }
-            var response = await UserRepository.AddUserDetail(addUserDetailRequestDTO);
+            var response = await UserDetailService.AddUserDetail(addUserDetailRequestDTO);
             return Ok(response);
         }
 
@@ -50,7 +51,7 @@ namespace DemoProject1.API.Controllers
             {
                 return BadRequest("Invalid data. Please recheck!");
             }
-            var response = await UserRepository.AddUser(addUserRequestDTO);
+            var response = await UserService.AddUser(addUserRequestDTO);
             return Ok(response);
         }
     }
