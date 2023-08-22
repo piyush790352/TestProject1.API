@@ -1,5 +1,4 @@
 ﻿using DemoProject1.API.Model.Domain;
-using DemoProject1.API.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text.Json;
 using TestProject1.API.Model.DTO;
@@ -36,13 +35,13 @@ namespace TestProject1.API.Service
             }
         }
 
-        public static async Task<Response<UserDetail>> AddUserDetail(AddUserDetailDTO addUserDetailRequestDTO)
+        public static async Task<Response<AddUserDetailDTO>> AddUserDetail(AddUserDetailDTO addUserDetailRequestDTO)
         {
             try
             {
                 if (addUserDetailRequestDTO == null)
                 {
-                    return new Response<UserDetail>
+                    return new Response<AddUserDetailDTO>
                     {
                         StatusMessage = "No recored found!."
                     };

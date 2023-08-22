@@ -1,5 +1,4 @@
 ﻿using DemoProject1.API.Model.Domain;
-using DemoProject1.API.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestProject1.API.Model.DTO;
@@ -41,17 +40,6 @@ namespace DemoProject1.API.Controllers
                 return BadRequest("Invalid data. Please recheck!");
             }
             var response = await UserDetailService.AddUserDetail(addUserDetailRequestDTO);
-            return Ok(response);
-        }
-
-        [HttpPost("AddUser")]
-        public async Task<IActionResult> AddUser([FromBody] AddUserDTO addUserRequestDTO)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Invalid data. Please recheck!");
-            }
-            var response = await UserService.AddUser(addUserRequestDTO);
             return Ok(response);
         }
     }

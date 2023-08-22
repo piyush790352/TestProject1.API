@@ -1,4 +1,5 @@
 ﻿using DemoProject1.API.Model.Domain;
+using System.Runtime.Intrinsics.X86;
 using System.Text.Json;
 using TestProject1.API.Model.DTO;
 
@@ -146,16 +147,37 @@ namespace TestProject1.API.Repository
             }
         }
 
-        public static async Task<Response<UserDetail>> AddUserDetail(AddUserDetailDTO addUserDetailRequestDTO)
+        public static async Task<Response<AddUserDetailDTO>> AddUserDetail(AddUserDetailDTO addUserDetailRequestDTO)
         {
             try
             {
                 int UserId = generateId();
-                string userList = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserList.json");
-                var userDetails = JsonSerializer.Deserialize<List<User>>(userList);
-                if (userDetails != null)
+                var user = new User()
                 {
-                    var user1 = new UserDetail()
+                    UserId = UserId,
+                    UserName = addUserDetailRequestDTO.UserName,
+                    Password = addUserDetailRequestDTO.Password,
+
+                };
+                if (user != null)
+                {
+                    string users = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserList.json");
+                    var userResults = JsonSerializer.Deserialize<List<User>>(users);
+                    foreach (var item in userResults)
+                    {
+                        if (item.UserName == user.UserName && item.Password == user.Password)
+                        {
+                            return new Response<AddUserDetailDTO>
+                            {
+                                StatusMessage = "User already exist."
+                            };
+                        }
+                    }
+                    userResults.Add(user);
+                    string userJson = JsonSerializer.Serialize(userResults);
+                    File.WriteAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserList.json", userJson);
+
+                    var userDetail = new UserDetail()
                     {
                         Id = UserId,
                         FirstName = addUserDetailRequestDTO.FirstName,
@@ -164,35 +186,26 @@ namespace TestProject1.API.Repository
                         Email = addUserDetailRequestDTO.Email,
                         Specialization = addUserDetailRequestDTO.Specialization,
                         IsEmployee = addUserDetailRequestDTO.IsEmployee,
-                        UserId = addUserDetailRequestDTO.UserId,
+                        UserId = UserId,
                     };
-                    if (user1 != null)
-                    {
-                        string text = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserDetailList.json");
-                        var userResults = JsonSerializer.Deserialize<List<UserDetail>>(text);
-                        foreach (var item in userResults)
-                        {
-                            if (item.Id == addUserDetailRequestDTO.UserId)
-                            {
-                                return new Response<UserDetail>
-                                {
-                                    StatusMessage = "This record already exist."
-                                };
-                            }
-                        }
-                        userResults.Add(user1);
-                        string json = JsonSerializer.Serialize(userResults);
-                        File.WriteAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserDetailList.json", json);
 
-                        return new Response<UserDetail>
-                        {
-                            Result = user1,
-                            StatusMessage = "Ok"
+                    if (userDetail != null)
+                    {
+                        string userDetails = File.ReadAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserDetailList.json");
+                        var userDetailResults = JsonSerializer.Deserialize<List<UserDetail>>(userDetails);
+                        userDetailResults.Add(userDetail);
+                        string userDetailJson = JsonSerializer.Serialize(userDetailResults);
+                        File.WriteAllText(@"D:\DotnetCoreProjects\TestProject\TestProject1.API\JsonData\UserDetailList.json", userDetailJson);
+
+                        return new Response<AddUserDetailDTO>
+                        {   
+                            Result=addUserDetailRequestDTO,
+                            StatusMessage = "Data has been added successfully!."
                         };
                     }
                     else
                     {
-                        return new Response<UserDetail>
+                        return new Response<AddUserDetailDTO>
                         {
                             StatusMessage = "No Record found..!"
                         };
@@ -200,9 +213,9 @@ namespace TestProject1.API.Repository
                 }
                 else
                 {
-                    return new Response<UserDetail>
+                    return new Response<AddUserDetailDTO>
                     {
-                        StatusMessage = "Please add user first"
+                        StatusMessage = "User already exist."
                     };
                 }
             }

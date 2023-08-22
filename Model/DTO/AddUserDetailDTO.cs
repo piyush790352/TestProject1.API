@@ -4,6 +4,14 @@ namespace TestProject1.API.Model.DTO
 {
     public class AddUserDetailDTO
     {
+        [Required(ErrorMessage = "User Name is required.")]
+        [RegularExpression("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{6,}$", ErrorMessage = "User Name must be minimum six characters long, one letter, one number and one special character.")]
+        public string UserName { get; set; }
+
+        [Required(ErrorMessage = "Password is required.")]
+        [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", ErrorMessage = "Password must be minimum eight characters long, at least one uppercase letter, one lowercase letter, one number and one special character.")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
         [Required(ErrorMessage = "First Name is required.")]
         [RegularExpression("^[a-zA-Z]*$", ErrorMessage = "Only characters are allow.")]
         [StringLength(15, MinimumLength = 4, ErrorMessage = "First Name must be at least 4 characters long and maximum upto 15 characters.")]
@@ -25,6 +33,5 @@ namespace TestProject1.API.Model.DTO
         [Required(ErrorMessage = "Specialization is required.")]
         public string Specialization { get; set; }
         public bool IsEmployee { get; set; }
-        public int UserId { get; set; }
     }
 }
