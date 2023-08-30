@@ -1,4 +1,5 @@
 ﻿using DemoProject1.API.Model.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TestProject1.API.Model.DTO;
@@ -8,6 +9,7 @@ namespace DemoProject1.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         [HttpGet("GetUserDetails")]
