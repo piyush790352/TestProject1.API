@@ -14,7 +14,7 @@ namespace TestProject1.API.Repository
         public readonly IConfiguration iconfiguration;
         public UserLoginRepository(IConfiguration configuration)
         {
-            iconfiguration = configuration;
+            this.iconfiguration = configuration;
         }
 
         public UserLoginRepository()
@@ -37,8 +37,8 @@ namespace TestProject1.API.Repository
                 else
                 {
                     var tokenHandler = new JwtSecurityTokenHandler();
-                    //var Key = "4899028db7a44673a3f27ce81ea53785";
-                    var secretKey = Encoding.UTF8.GetBytes(iconfiguration["Jwt:Key"]);
+                    var Key = "4899028db7a44673a3f27ce81ea53785";
+                    var secretKey = Encoding.UTF8.GetBytes(Key);
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
                         Subject = new ClaimsIdentity(new Claim[]
