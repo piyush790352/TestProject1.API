@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TestProject1.API.IService;
+using TestProject1.API.Repository;
+using TestProject1.API.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,8 +29,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     };
 });
 
-var app = builder.Build();
 
+builder.Services.AddScoped<IUserDetailService, UserDetailService>();
+builder.Services.AddTransient(typeof(ISchoolRepository<>),typeof(UserDetailRepository<>));
+
+
+
+var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

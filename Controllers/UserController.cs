@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TestProject1.API.IService;
 using TestProject1.API.Model.DTO;
 using TestProject1.API.Service;
 
@@ -9,9 +10,15 @@ namespace DemoProject1.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+   // [Authorize]
     public class UserController : ControllerBase
     {
+        public readonly IUserDetailService _userDetailService;
+        public UserController(IUserDetailService userDetailService)
+        {
+            _userDetailService = userDetailService;
+        }
+
         [HttpGet("GetUserDetails")]
         public async Task<IActionResult> GetUserDetails()
         {
@@ -19,7 +26,7 @@ namespace DemoProject1.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var response = await UserDetailService.GetUserDetails();
+            var response = await _userDetailService.GetUserDetails();
             return Ok(response);
         }
 
@@ -30,7 +37,7 @@ namespace DemoProject1.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var response = await UserDetailService.GetUserDetailById(Id);
+            var response = await _userDetailService.GetUserDetailById(Id);
             return Ok(response);
         }
 
@@ -41,7 +48,7 @@ namespace DemoProject1.API.Controllers
             {
                 return BadRequest("Invalid data. Please recheck!");
             }
-            var response = await UserDetailService.AddUserDetail(addUserDetailRequestDTO);
+            var response = await _userDetailService.AddUserDetail(addUserDetailRequestDTO);
             return Ok(response);
         }
     }
