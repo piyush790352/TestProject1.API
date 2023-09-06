@@ -4,12 +4,17 @@ using System.IO;
 using System.Net;
 using System.Text.Json;
 using TestProject1.API.Model.DTO;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace TestProject1.API.Repository
 {
-    public class UserDetailRepository<T> : ISchoolRepository<T> where T : class
+    public class SchoolRepository<T> : ISchoolRepository<T> where T : class
     {
+        public List<T> ReadJsonData(string path)
+        {
+            string addUser = File.ReadAllText(path);
+            return JsonSerializer.Deserialize<List<T>>(addUser);
+        }
 
         public List<T> Get(string path)
         {
@@ -23,10 +28,10 @@ namespace TestProject1.API.Repository
             return JsonConvert.DeserializeObject<List<T>>(jsonUserData);
 
         }
-        public List<T> Set(string path, AddUserDetailDTO addUserDetailRequestDTO)
+        public void Set(string path, List<T> addDataRequest)
         {
-            var jsonUserData = new WebClient().DownloadString(path);
-            return JsonConvert.DeserializeObject<List<T>>(jsonUserData);
+            string resultData = JsonSerializer.Serialize(addDataRequest);
+            File.WriteAllText(path, resultData);
         }
     }
 }

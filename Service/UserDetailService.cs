@@ -17,11 +17,12 @@ namespace TestProject1.API.Service
             _userRepository = userRepository;
         }
 
-        string fullPath = null;
+        string path1 = null;
+        string path2 = null;
         public UserDetailService()
         {
-            string path = "JsonData/UserDetailList.json";
-            fullPath = Path.GetFullPath(path);
+            path1 = @".\JsonData\UserList.json";
+            path2 = @".\JsonData\UserDetailList.json";
         }
 
         public async Task<Response<List<UserDetailDTO>>> GetUserDetails()
@@ -29,7 +30,7 @@ namespace TestProject1.API.Service
             try
             {
                 UserDetailService userDetailService = new UserDetailService();
-                var responseUserDetail = _userDetailRepository.Get(userDetailService.fullPath);
+                var responseUserDetail = _userDetailRepository.Get(userDetailService.path2);
                 if (responseUserDetail == null)
                 {
                     return new Response<List<UserDetailDTO>>
@@ -41,9 +42,7 @@ namespace TestProject1.API.Service
                 {
                     string path = "JsonData/UserList.json";
                     string userListFullPath = Path.GetFullPath(path);
-                    //UserService userService = new UserService(UserFullPath);
                     var responseUser = _userRepository.Get(userListFullPath);
-                    //var responseUser = _userDetailRepository.Get(userService.fu);
                     if (responseUser == null)
                     {
                         return new Response<List<UserDetailDTO>>
@@ -95,7 +94,7 @@ namespace TestProject1.API.Service
             try
             {
                 UserDetailService userDetailService = new UserDetailService();
-                var responseUserDetail = _userDetailRepository.GetById(userDetailService.fullPath, Id);
+                var responseUserDetail = _userDetailRepository.GetById(userDetailService.path2, Id);
 
                 string path = "JsonData/UserList.json";
                 string userListFullPath = Path.GetFullPath(path);
@@ -142,13 +141,28 @@ namespace TestProject1.API.Service
         {
             try
             {
-                string path = "JsonData/UserList.json";
-                string userListFullPath = Path.GetFullPath(path);
-                var responseUserList = _userDetailRepository.Set(userListFullPath, addUserDetailRequestDTO);
-                
-                if (responseUserList != null)
+                UserDetailService userDetailService = new UserDetailService();
+                var userListRepository = new SchoolRepository<User>();
+                var responseUserList = userListRepository.ReadJsonData(userDetailService.path1);
+
+                var usercheck = (from obj in responseUserList
+                                 where obj.UserName.Equals(addUserDetailRequestDTO.UserName) &&
+                                 obj.Password.Equals(addUserDetailRequestDTO.Password)
+                                 select obj).Count();
+
+
+                if (usercheck > 0)
                 {
-                    int UserId = responseUserList.Count > 0 ? responseUserList[responseUserList.Count - 1].UserId + 1 : 1;                   
+                    return new Response<AddUserDetailDTO>
+                    {
+
+                        StatusMessage = "User already exists"
+                    };
+                }
+                else
+                {
+
+                    int UserId = responseUserList.Count > 0 ? responseUserList[responseUserList.Count - 1].UserId + 1 : 1;
                     var user = new User()
                     {
                         UserId = UserId,
@@ -156,71 +170,35 @@ namespace TestProject1.API.Service
                         Password = addUserDetailRequestDTO.Password,
 
                     };
-                    if (user != null)
+                    responseUserList.Add(user);
+                    userListRepository.Set(userDetailService.path1, responseUserList);
+
+                    var userDetailRepository = new SchoolRepository<UserDetail>();
+                    var responseUserDetail = userDetailRepository.ReadJsonData(userDetailService.path2);
+
+                    var userDetail = new UserDetail()
                     {
-                        string users = File.ReadAllText(userListFullPath);
-                        var userResults = JsonSerializer.Deserialize<List<User>>(users);
-                        foreach (var item in userResults)
+                        Id = UserId,
+                        FirstName = addUserDetailRequestDTO.FirstName,
+                        LastName = addUserDetailRequestDTO.LastName,
+                        Gender = addUserDetailRequestDTO.Gender,
+                        Email = addUserDetailRequestDTO.Email,
+                        Specialization = addUserDetailRequestDTO.Specialization,
+                        IsEmployee = addUserDetailRequestDTO.IsEmployee,
+                        UserId = UserId,
+                    };
+
+                    if (userDetail != null)
+                    {
+                        responseUserDetail.Add(userDetail);
+                        userDetailRepository.Set(userDetailService.path2, responseUserDetail);
+
+
+                        return new Response<AddUserDetailDTO>
                         {
-                            if (item.UserName == user.UserName && item.Password == user.Password)
-                            {
-                                return new Response<AddUserDetailDTO>
-                                {
-                                    StatusMessage = "User already exist."
-                                };
-                            }
-                        }
-                        userResults.Add(user);
-                        string userJson = JsonSerializer.Serialize(userResults);
-                        File.WriteAllText(userListFullPath, userJson);
-
-                        UserDetailService userDetailService = new UserDetailService();
-                        var responseUserDetail = _userDetailRepository.Set(userListFullPath, addUserDetailRequestDTO);
-                        if (responseUserDetail != null)
-                        {
-                            var userDetail = new UserDetail()
-                            {
-                                Id = UserId,
-                                FirstName = addUserDetailRequestDTO.FirstName,
-                                LastName = addUserDetailRequestDTO.LastName,
-                                Gender = addUserDetailRequestDTO.Gender,
-                                Email = addUserDetailRequestDTO.Email,
-                                Specialization = addUserDetailRequestDTO.Specialization,
-                                IsEmployee = addUserDetailRequestDTO.IsEmployee,
-                                UserId = UserId,
-                            };
-
-                            if (userDetail != null)
-                            {
-                                string userDetails = File.ReadAllText(userDetailService.fullPath);
-                                var userDetailResults = JsonSerializer.Deserialize<List<UserDetail>>(userDetails);
-                                userDetailResults.Add(userDetail);
-                                string userDetailJson = JsonSerializer.Serialize(userDetailResults);
-                                File.WriteAllText(userDetailService.fullPath, userDetailJson);
-
-
-
-                                return new Response<AddUserDetailDTO>
-                                {
-                                    Result = addUserDetailRequestDTO,
-                                    StatusMessage = "Data has been added successfully!."
-                                };
-                            }
-                            else
-                            {
-                                return new Response<AddUserDetailDTO>
-                                {
-                                    StatusMessage = "No Record found..!"
-                                };
-                            }
-                        }
-                        else
-                        {
-                            return new Response<AddUserDetailDTO>
-                            {
-                                StatusMessage = "No Record found..!"
-                            };
-                        }
+                            Result = addUserDetailRequestDTO,
+                            StatusMessage = "Data has been added successfully!."
+                        };
                     }
                     else
                     {
@@ -230,13 +208,7 @@ namespace TestProject1.API.Service
                         };
                     }
                 }
-                else
-                {
-                    return new Response<AddUserDetailDTO>
-                    {
-                        StatusMessage = "No Record found..!"
-                    };
-                }
+
             }
             catch (Exception ex)
             {

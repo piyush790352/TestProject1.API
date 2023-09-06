@@ -8,6 +8,6 @@ namespace TestProject1.API.Repository
     {
         public List<T> Get(string path);
         public List<T> GetById(string path,int id);
-        public List<T> Set(string fullPath, AddUserDetailDTO addUserDetailRequestDTO);
+        public void Set(string path, List<T> addDataRequest);
     }
 }

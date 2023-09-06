@@ -31,7 +31,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 builder.Services.AddScoped<IUserDetailService, UserDetailService>();
-builder.Services.AddTransient(typeof(ISchoolRepository<>),typeof(UserDetailRepository<>));
+builder.Services.AddScoped<IUserLoginService, UserLoginService>();
+builder.Services.AddTransient(typeof(ISchoolRepository<>),typeof(SchoolRepository<>));
+builder.Services.AddTransient(typeof(ILoginRepository<>), typeof(UserLoginRepository<>));
 
 
 
