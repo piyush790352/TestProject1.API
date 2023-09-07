@@ -10,16 +10,11 @@ namespace TestProject1.API.Repository
 {
     public class SchoolRepository<T> : ISchoolRepository<T> where T : class
     {
-        public List<T> ReadJsonData(string path)
-        {
-            string addUser = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<List<T>>(addUser);
-        }
 
         public List<T> Get(string path)
         {
-            var jsonUserData = new WebClient().DownloadString(path);
-            return JsonConvert.DeserializeObject<List<T>>(jsonUserData);
+            string jsonUserData = File.ReadAllText(path);
+            return JsonSerializer.Deserialize<List<T>>(jsonUserData);
         }
 
         public List<T> GetById(string path, int id)

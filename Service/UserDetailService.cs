@@ -30,8 +30,9 @@ namespace TestProject1.API.Service
             try
             {
                 UserDetailService userDetailService = new UserDetailService();
-                var responseUserDetail = _userDetailRepository.Get(userDetailService.path2);
-                if (responseUserDetail == null)
+               // var userListRepository = new SchoolRepository<User>();
+                var responseUserList = _userRepository.Get(userDetailService.path1);
+                if (responseUserList == null)
                 {
                     return new Response<List<UserDetailDTO>>
                     {
@@ -40,10 +41,10 @@ namespace TestProject1.API.Service
                 }
                 else
                 {
-                    string path = "JsonData/UserList.json";
-                    string userListFullPath = Path.GetFullPath(path);
-                    var responseUser = _userRepository.Get(userListFullPath);
-                    if (responseUser == null)
+                   
+                   // var userDetailRepository = new SchoolRepository<UserDetail>();
+                    var responseUserDetail = _userDetailRepository.Get(userDetailService.path2);
+                    if (responseUserDetail == null)
                     {
                         return new Response<List<UserDetailDTO>>
                         {
@@ -52,7 +53,7 @@ namespace TestProject1.API.Service
                     }
                     else
                     {
-                        var result = (from objuser in responseUser
+                        var result = (from objuser in responseUserList
                                       join objuserDetail in responseUserDetail on objuser.UserId equals objuserDetail.UserId
                                       select new UserDetailDTO()
                                       {
@@ -142,8 +143,7 @@ namespace TestProject1.API.Service
             try
             {
                 UserDetailService userDetailService = new UserDetailService();
-                var userListRepository = new SchoolRepository<User>();
-                var responseUserList = userListRepository.ReadJsonData(userDetailService.path1);
+                var responseUserList = _userRepository.Get(userDetailService.path1);
 
                 var usercheck = (from obj in responseUserList
                                  where obj.UserName.Equals(addUserDetailRequestDTO.UserName) &&
@@ -171,10 +171,10 @@ namespace TestProject1.API.Service
 
                     };
                     responseUserList.Add(user);
-                    userListRepository.Set(userDetailService.path1, responseUserList);
+                    _userRepository.Set(userDetailService.path1, responseUserList);
 
-                    var userDetailRepository = new SchoolRepository<UserDetail>();
-                    var responseUserDetail = userDetailRepository.ReadJsonData(userDetailService.path2);
+            
+                    var responseUserDetail = _userDetailRepository.Get(userDetailService.path2);
 
                     var userDetail = new UserDetail()
                     {
@@ -191,7 +191,7 @@ namespace TestProject1.API.Service
                     if (userDetail != null)
                     {
                         responseUserDetail.Add(userDetail);
-                        userDetailRepository.Set(userDetailService.path2, responseUserDetail);
+                        _userDetailRepository.Set(userDetailService.path2, responseUserDetail);
 
 
                         return new Response<AddUserDetailDTO>
