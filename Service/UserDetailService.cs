@@ -30,7 +30,6 @@ namespace TestProject1.API.Service
             try
             {
                 UserDetailService userDetailService = new UserDetailService();
-               // var userListRepository = new SchoolRepository<User>();
                 var responseUserList = _userRepository.Get(userDetailService.path1);
                 if (responseUserList == null)
                 {
@@ -40,46 +39,34 @@ namespace TestProject1.API.Service
                     };
                 }
                 else
-                {
-                   
-                   // var userDetailRepository = new SchoolRepository<UserDetail>();
+                {                  
                     var responseUserDetail = _userDetailRepository.Get(userDetailService.path2);
-                    if (responseUserDetail == null)
+                    var result = (from objuser in responseUserList
+                                  join objuserDetail in responseUserDetail on objuser.UserId equals objuserDetail.UserId
+                                  select new UserDetailDTO()
+                                  {
+                                      UserName = objuser.UserName,
+                                      FirstName = objuserDetail.FirstName,
+                                      LastName = objuserDetail.LastName,
+                                      Email = objuserDetail.Email,
+                                      Gender = objuserDetail.Gender,
+                                      Specialization = objuserDetail.Specialization,
+                                      IsEmployee = objuserDetail.IsEmployee
+                                  }).ToList();
+                    if (result.Count > 0)
                     {
                         return new Response<List<UserDetailDTO>>
                         {
-                            StatusMessage = "No Record Found!."
+                            Result = result,
+                            StatusMessage = "Ok"
                         };
                     }
                     else
                     {
-                        var result = (from objuser in responseUserList
-                                      join objuserDetail in responseUserDetail on objuser.UserId equals objuserDetail.UserId
-                                      select new UserDetailDTO()
-                                      {
-                                          UserName = objuser.UserName,
-                                          FirstName = objuserDetail.FirstName,
-                                          LastName = objuserDetail.LastName,
-                                          Email = objuserDetail.Email,
-                                          Gender = objuserDetail.Gender,
-                                          Specialization = objuserDetail.Specialization,
-                                          IsEmployee = objuserDetail.IsEmployee
-                                      }).ToList();
-                        if (result.Count > 0)
+                        return new Response<List<UserDetailDTO>>
                         {
-                            return new Response<List<UserDetailDTO>>
-                            {
-                                Result = result,
-                                StatusMessage = "Ok"
-                            };
-                        }
-                        else
-                        {
-                            return new Response<List<UserDetailDTO>>
-                            {
-                                StatusMessage = "No recored found!."
-                            };
-                        }
+                            StatusMessage = "No recored found!."
+                        };
                     }
 
                 }
@@ -95,40 +82,46 @@ namespace TestProject1.API.Service
             try
             {
                 UserDetailService userDetailService = new UserDetailService();
-                var responseUserDetail = _userDetailRepository.GetById(userDetailService.path2, Id);
+                var responseUserList = _userRepository.Get(userDetailService.path1);
 
-                string path = "JsonData/UserList.json";
-                string userListFullPath = Path.GetFullPath(path);
-                //UserService userService = new UserService(UserFullPath);
-                var responseUser = _userRepository.GetById(userListFullPath, Id);
-
-                var result = (from objuser in responseUser
-                              join objuserDetail in responseUserDetail on objuser.UserId equals objuserDetail.UserId
-                              where objuserDetail.UserId == Id
-                              select new UserDetailDTO()
-                              {
-                                  UserName = objuser.UserName,
-                                  FirstName = objuserDetail.FirstName,
-                                  LastName = objuserDetail.LastName,
-                                  Email = objuserDetail.Email,
-                                  Gender = objuserDetail.Gender,
-                                  Specialization = objuserDetail.Specialization,
-                                  IsEmployee = objuserDetail.IsEmployee
-                              }).FirstOrDefault();
-                if (result != null)
+                if (responseUserList == null)
                 {
                     return new Response<UserDetailDTO>
                     {
-                        Result = result,
-                        StatusMessage = "Ok"
+                        StatusMessage = "No Record Found!."
                     };
                 }
                 else
                 {
-                    return new Response<UserDetailDTO>
+                    var responseUserDetail = _userDetailRepository.Get(userDetailService.path2);
+                    var result = (from objuser in responseUserList
+                                  join objuserDetail in responseUserDetail on objuser.UserId equals objuserDetail.UserId
+                                  where objuserDetail.UserId == Id
+                                  select new UserDetailDTO()
+                                  {
+                                      UserName = objuser.UserName,
+                                      FirstName = objuserDetail.FirstName,
+                                      LastName = objuserDetail.LastName,
+                                      Email = objuserDetail.Email,
+                                      Gender = objuserDetail.Gender,
+                                      Specialization = objuserDetail.Specialization,
+                                      IsEmployee = objuserDetail.IsEmployee
+                                  }).FirstOrDefault();
+                    if (result != null)
                     {
-                        StatusMessage = "No recored found!."
-                    };
+                        return new Response<UserDetailDTO>
+                        {
+                            Result = result,
+                            StatusMessage = "Ok"
+                        };
+                    }
+                    else
+                    {
+                        return new Response<UserDetailDTO>
+                        {
+                            StatusMessage = "No recored found!."
+                        };
+                    }
                 }
 
             }
@@ -173,7 +166,7 @@ namespace TestProject1.API.Service
                     responseUserList.Add(user);
                     _userRepository.Set(userDetailService.path1, responseUserList);
 
-            
+
                     var responseUserDetail = _userDetailRepository.Get(userDetailService.path2);
 
                     var userDetail = new UserDetail()
