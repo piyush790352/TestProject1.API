@@ -18,7 +18,7 @@ namespace TestProject1.API.Controllers
             _userLoginService = userLoginService;
         }
 
-        [HttpPost("Login")]
+        [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
             if (!ModelState.IsValid)

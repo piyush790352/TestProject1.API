@@ -59,6 +59,7 @@ namespace TestProject1.API.Service
                     var token = tokenHandler.CreateToken(tokenDescriptor);
                     UserLoginWithToken userResult = new UserLoginWithToken()
                     {
+                        UserId = resUser.UserId,
                         UserName = loginRequestDTO.UserName,
                         Password = loginRequestDTO.Password,
                         Token = tokenHandler.WriteToken(token)
