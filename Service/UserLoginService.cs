@@ -14,26 +14,29 @@ namespace TestProject1.API.Service
     public class UserLoginService : IUserLoginService
     {
         private readonly ILoginRepository<User> _userLoginRepository;
+        private readonly ILoginRepository<UserDetail> _userLoginDetailRepository;
         public readonly IConfiguration iconfiguration;
-        public UserLoginService(ILoginRepository<User> userLoginRepository, IConfiguration configuration)
+        public UserLoginService(ILoginRepository<User> userLoginRepository, ILoginRepository<UserDetail> userLoginDetailRepository, IConfiguration configuration)
         {
             _userLoginRepository = userLoginRepository;
+            _userLoginDetailRepository = userLoginDetailRepository;
             this.iconfiguration = configuration;
         }
 
 
-        string fullPath = null;
+        string path1 = null;
+        string path2 = null;
         public UserLoginService()
         {
-            string path = "JsonData/UserList.json";
-            fullPath = Path.GetFullPath(path);
+            path1 = @".\JsonData\UserList.json";
+            path2 = @".\JsonData\UserDetailList.json";
         }
         public async Task<Response<UserLoginWithToken>> Login(LoginRequestDTO loginRequestDTO)
         {
             try
             {
                 UserLoginService userLoginService = new UserLoginService();
-                var responseUserResult = _userLoginRepository.Login(userLoginService.fullPath, loginRequestDTO);
+                var responseUserResult = _userLoginRepository.Login(userLoginService.path1, loginRequestDTO);
                 var resUser = responseUserResult.FirstOrDefault(x => x.UserName == loginRequestDTO.UserName && x.Password == loginRequestDTO.Password);
                 if (resUser == null)
                 {
@@ -57,12 +60,27 @@ namespace TestProject1.API.Service
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature)
                     };
                     var token = tokenHandler.CreateToken(tokenDescriptor);
+                    var responseUserDetailResult = _userLoginDetailRepository.Login(userLoginService.path2, loginRequestDTO);
+                    var resDetailUser = responseUserDetailResult.FirstOrDefault(x => x.UserId == resUser.UserId);
+                    var result = (from objuser in responseUserResult
+                                  join objuserDetail in responseUserDetailResult on objuser.UserId equals objuserDetail.UserId 
+                                  where objuser.UserId == resUser.UserId
+                                  select new UserDetailDTO()
+                                  {
+                                      UserName = loginRequestDTO.UserName,
+                                      FirstName = objuserDetail.FirstName,
+                                      LastName = objuserDetail.LastName,
+                                      Email = objuserDetail.Email,
+                                      Gender = objuserDetail.Gender,
+                                      Specialization = objuserDetail.Specialization,
+                                      IsEmployee = objuserDetail.IsEmployee
+                                  }).FirstOrDefault();
+
                     UserLoginWithToken userResult = new UserLoginWithToken()
                     {
                         UserId = resUser.UserId,
-                        UserName = loginRequestDTO.UserName,
-                        Password = loginRequestDTO.Password,
-                        Token = tokenHandler.WriteToken(token)
+                        Token = tokenHandler.WriteToken(token),
+                        UserDetailDTO = result
                     };
                     return new Response<UserLoginWithToken>
                     {
