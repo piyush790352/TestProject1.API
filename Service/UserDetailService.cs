@@ -2,8 +2,10 @@
 using System.Runtime.Intrinsics.X86;
 using System.Text.Json;
 using TestProject1.API.IService;
+using TestProject1.API.Model.Domain;
 using TestProject1.API.Model.DTO;
 using TestProject1.API.Repository;
+using static TestProject1.API.Model.DTO.AddMarksheetDetailDTO;
 
 namespace TestProject1.API.Service
 {
@@ -11,18 +13,27 @@ namespace TestProject1.API.Service
     {
         private readonly ISchoolRepository<UserDetail> _userDetailRepository;
         private readonly ISchoolRepository<User> _userRepository;
-        public UserDetailService(ISchoolRepository<UserDetail> userDetailRepository, ISchoolRepository<User> userRepository)
+        private readonly ISchoolRepository<Subject> _subjectRepository;
+        private readonly ISchoolRepository<Grade> _gradeRepository;
+        public UserDetailService(ISchoolRepository<UserDetail> userDetailRepository, ISchoolRepository<User> userRepository,
+            ISchoolRepository<Subject> subjectRepository, ISchoolRepository<Grade> gradeRepository)
         {
             _userDetailRepository = userDetailRepository;
             _userRepository = userRepository;
+            _subjectRepository = subjectRepository;
+            _gradeRepository = gradeRepository;
         }
 
         string path1 = null;
         string path2 = null;
+        string subjectPath = null;
+        string gradePath = null;
         public UserDetailService()
         {
             path1 = @".\JsonData\UserList.json";
             path2 = @".\JsonData\UserDetailList.json";
+            subjectPath = @".\JsonData\Subject.json";
+            gradePath = @".\JsonData\Grade.json";
         }
 
         public async Task<Response<List<UserDetailDTO>>> GetUserDetails()
@@ -39,7 +50,7 @@ namespace TestProject1.API.Service
                     };
                 }
                 else
-                {                  
+                {
                     var responseUserDetail = _userDetailRepository.Get(userDetailService.path2);
                     var result = (from objuser in responseUserList
                                   join objuserDetail in responseUserDetail on objuser.UserId equals objuserDetail.UserId
@@ -202,6 +213,70 @@ namespace TestProject1.API.Service
                     }
                 }
 
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+        public async Task<Response<string>> AddMarksheetDetail(AddMarksheetDetailDTO addMarksheetDetailDTO)
+        {
+            try
+            {
+                UserDetailService userDetailService = new UserDetailService();
+                var responseSubjectList = _subjectRepository.Get(userDetailService.subjectPath);
+                var subjectCheck = 0;
+                foreach (var item in addMarksheetDetailDTO.markSheetList)
+                {
+                    subjectCheck = (from obj in responseSubjectList
+                                    where obj.SubjectName.Equals(item.subject) &&
+                                     obj.UserId.Equals(addMarksheetDetailDTO.UserId)
+                                    select obj).Count();
+
+                    if (subjectCheck == 0)
+                    {
+
+                        int Id = responseSubjectList.Count > 0 ? responseSubjectList[responseSubjectList.Count - 1].SubjectId + 1 : 1;
+                        var subject = new Subject()
+                        {
+                            SubjectId = Id,
+                            SubjectName = item.subject,
+                            //SubjectDescription = item.SubjectDescription,
+                            UserId = addMarksheetDetailDTO.UserId,
+
+                        };
+                        responseSubjectList.Add(subject);
+                        _subjectRepository.Set(userDetailService.subjectPath, responseSubjectList);
+
+
+                        var responseGradeDetail = _gradeRepository.Get(userDetailService.gradePath);
+
+                        var grade = new Grade()
+                        {
+                            GradeId = Id,
+                            GradeType = item.grade,
+                            //GradeDescription = item.GradeDescription,
+                            SubjectId = Id
+                        };
+
+                        responseGradeDetail.Add(grade);
+                        _gradeRepository.Set(userDetailService.gradePath, responseGradeDetail);
+
+                    }
+                }
+                if (subjectCheck > 0)
+                {
+                    return new Response<string>
+                    {
+                        StatusMessage = "Subject already added for this students."
+                    };
+                }
+                return new Response<string>
+                {
+                    StatusMessage = "Data added successfully!.."
+                };
             }
             catch (Exception ex)
             {

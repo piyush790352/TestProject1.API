@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using TestProject1.API.IService;
 using TestProject1.API.Model.DTO;
 using TestProject1.API.Service;
+using static TestProject1.API.Model.DTO.AddMarksheetDetailDTO;
 
 namespace DemoProject1.API.Controllers
 {
@@ -49,6 +50,17 @@ namespace DemoProject1.API.Controllers
                 return BadRequest("Invalid data. Please recheck!");
             }
             var response = await _userDetailService.AddUserDetail(addUserDetailRequestDTO);
+            return Ok(response);
+        }
+
+        [HttpPost("AddMarksheetDetail")]
+        public async Task<IActionResult> AddMarksheetDetail([FromBody] AddMarksheetDetailDTO addMarksheetDetailDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data. Please recheck!");
+            }
+            var response = await _userDetailService.AddMarksheetDetail(addMarksheetDetailDTO);
             return Ok(response);
         }
     }
