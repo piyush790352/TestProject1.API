@@ -38,6 +38,14 @@ builder.Services.AddTransient(typeof(ILoginRepository<>), typeof(UserLoginReposi
 
 
 var app = builder.Build();
+
+app.UseCors(x => x
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
+app.UseHttpsRedirection();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

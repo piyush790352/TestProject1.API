@@ -8,14 +8,13 @@ namespace TestProject1.API.Model.DTO
        // [Required(ErrorMessage = "Subject is required.")]
         public int UserId { get; set; }
         // [Required(ErrorMessage = "Subject is required.")]
-        public List<MarkSheetList>? markSheetList { get; set; }
-        public class MarkSheetList
+        public List<MarkSheetListNew> markSheetListNew { get; set; }
+        public class MarkSheetListNew
         {
-            public string? subject { get; set; }
-            // public string SubjectDescription { get; set; }
-            //  [Required(ErrorMessage = "Grade is required.")]
-            public string? grade { get; set; }
-            //public string GradeDescription { get; set; }
+            public int subjectId { get; set; }
+            public string subject { get; set; }
+            public int gradeId { get; set; }
+            public string grade { get; set; }
         }
     }
 }

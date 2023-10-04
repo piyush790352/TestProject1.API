@@ -8,7 +8,5 @@ namespace TestProject1.API.Model.Domain
         public int GradeId { get; set; }
         public string GradeType { get; set; }
         public string GradeDescription { get; set; }
-        public int SubjectId { get; set; }
-
     }
 }

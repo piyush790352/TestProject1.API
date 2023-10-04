@@ -9,5 +9,6 @@ namespace TestProject1.API.IService
         Task<Response<UserDetailDTO>> GetUserDetailById(int Id);
         Task<Response<AddUserDetailDTO>> AddUserDetail(AddUserDetailDTO addUserDetailRequestDTO);
         Task<Response<string>> AddMarksheetDetail(AddMarksheetDetailDTO addMarksheetDetailDTO);
+        Task<Response<List<GetMarkSheetDetailDTO>>> GetMarksheetList(int UserId);
     }
 }

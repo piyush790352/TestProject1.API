@@ -63,5 +63,16 @@ namespace DemoProject1.API.Controllers
             var response = await _userDetailService.AddMarksheetDetail(addMarksheetDetailDTO);
             return Ok(response);
         }
+
+        [HttpGet("GetMarksheetList/{UserId}")]
+        public async Task<IActionResult> GetMarksheetList(int UserId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _userDetailService.GetMarksheetList(UserId);
+            return Ok(response);
+        }
     }
 }
