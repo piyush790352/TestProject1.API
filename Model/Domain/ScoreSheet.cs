@@ -4,7 +4,7 @@
     {
        public int UserId { get; set; }
 
-        public List<MarkSheetList> markSheetList { get; set; }
+        public List<MarkSheetList>? markSheetList { get; set; }
         public class MarkSheetList
         {
             public int subjectId { get; set; }

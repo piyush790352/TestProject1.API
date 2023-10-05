@@ -236,67 +236,137 @@ namespace TestProject1.API.Service
                 var responseSubjectList = _subjectRepository.Get(userDetailService.subjectPath);
                 var responseScoreSheetList = _scoresheetRepository.Get(userDetailService.scoresheetPath);
                 var subjectCheck = 0;
-                foreach (var item in addMarksheetDetailDTO.markSheetListNew)
+                var resUser = responseScoreSheetList.FirstOrDefault(x => x.UserId == addMarksheetDetailDTO.UserId);
+                if (resUser == null)
                 {
-                    subjectCheck = (from obj in responseSubjectList
-                                    where obj.SubjectId.Equals(item.subjectId)
-                                    //&& scoreSheet1.UserId.Equals(addMarksheetDetailDTO.UserId)
-                                    select obj).Count();
-
-                    if (subjectCheck == 0)
+                    foreach (var item in addMarksheetDetailDTO.markSheetListNew)
                     {
+                        subjectCheck = (from obj in responseSubjectList
+                                        where obj.SubjectId.Equals(item.subjectId)
+                                        //&& scoreSheet1.UserId.Equals(addMarksheetDetailDTO.UserId)
+                                        select obj).Count();
 
-                        List<ScoreSheet.MarkSheetList> markSheetLists = new List<ScoreSheet.MarkSheetList>();
-                        ScoreSheet.MarkSheetList markSheet = new ScoreSheet.MarkSheetList();
-                        markSheet.subjectId = item.subjectId;
-                        markSheet.gradeId = item.gradeId;
-                        markSheetLists.Add(markSheet);
-                        ScoreSheet scoreSheet = new ScoreSheet()
+                        if (subjectCheck == 0)
                         {
-                            UserId=addMarksheetDetailDTO.UserId,
-                            markSheetList = markSheetLists
-                        };
-                        responseScoreSheetList.Add(scoreSheet);
-                        _scoresheetRepository.Set(userDetailService.scoresheetPath, responseScoreSheetList);
+
+                            List<ScoreSheet.MarkSheetList> markSheetLists = new List<ScoreSheet.MarkSheetList>();
+                            ScoreSheet.MarkSheetList markSheet = new ScoreSheet.MarkSheetList();
+                            markSheet.subjectId = item.subjectId;
+                            markSheet.gradeId = item.gradeId;
+                            markSheetLists.Add(markSheet);
+                            ScoreSheet scoreSheet = new ScoreSheet()
+                            {
+                                UserId = addMarksheetDetailDTO.UserId,
+                                markSheetList = markSheetLists
+                            };
+                            responseScoreSheetList.Add(scoreSheet);
+                            _scoresheetRepository.Set(userDetailService.scoresheetPath, responseScoreSheetList);
 
 
-                        var subject = new Subject()
-                        {
-                            SubjectId = item.subjectId,
-                            SubjectName = item.subject,
-                            //SubjectDescription = item.SubjectDescription,
+                            var subject = new Subject()
+                            {
+                                SubjectId = item.subjectId,
+                                SubjectName = item.subject,
+                                //SubjectDescription = item.SubjectDescription,
 
-                        };
-                        responseSubjectList.Add(subject);
-                        _subjectRepository.Set(userDetailService.subjectPath, responseSubjectList);
+                            };
+                            responseSubjectList.Add(subject);
+                            _subjectRepository.Set(userDetailService.subjectPath, responseSubjectList);
 
 
-                        var responseGradeDetail = _gradeRepository.Get(userDetailService.gradePath);
+                            var responseGradeDetail = _gradeRepository.Get(userDetailService.gradePath);
 
-                        var grade = new Grade()
-                        {
-                            GradeId = item.gradeId,
-                            GradeType = item.grade,
-                            //GradeDescription = item.GradeDescription,
-                            //SubjectId = Id
-                        };
+                            var grade = new Grade()
+                            {
+                                GradeId = item.gradeId,
+                                GradeType = item.grade,
+                                //GradeDescription = item.GradeDescription,
+                                //SubjectId = Id
+                            };
 
-                        responseGradeDetail.Add(grade);
-                        _gradeRepository.Set(userDetailService.gradePath, responseGradeDetail);
+                            responseGradeDetail.Add(grade);
+                            _gradeRepository.Set(userDetailService.gradePath, responseGradeDetail);
 
+                        }
                     }
-                }
-                if (subjectCheck > 0)
-                {
+                    if (subjectCheck > 0)
+                    {
+                        return new Response<string>
+                        {
+                            StatusMessage = "Subject already added for this students."
+                        };
+                    }
                     return new Response<string>
                     {
-                        StatusMessage = "Subject already added for this students."
+                        StatusMessage = "Data added successfully!.."
                     };
                 }
-                return new Response<string>
+                else
                 {
-                    StatusMessage = "Data added successfully!.."
-                };
+                    foreach (var item in addMarksheetDetailDTO.markSheetListNew)
+                    {
+                        subjectCheck = (from obj in responseSubjectList
+                                        where obj.SubjectId.Equals(item.subjectId)
+                                        //&& resUser.UserId.Equals(addMarksheetDetailDTO.UserId)
+                                        select obj).Count();
+
+                        if (subjectCheck == 0)
+                        {
+
+                            List<ScoreSheet.MarkSheetList> markSheetLists = new List<ScoreSheet.MarkSheetList>();
+                            ScoreSheet.MarkSheetList markSheet = new ScoreSheet.MarkSheetList();
+                            markSheet.subjectId = item.subjectId;
+                            markSheet.gradeId = item.gradeId;
+                            markSheetLists.Add(markSheet);
+                            //ScoreSheet scoreSheet = new ScoreSheet()
+                            //{
+                            //    //UserId = addMarksheetDetailDTO.UserId,
+                            //    markSheetList = markSheetLists
+                            //};
+                            //responseScoreSheetList.Add(markSheetLists);
+                            resUser.markSheetList.Add(markSheet);
+                            _scoresheetRepository.Set(userDetailService.scoresheetPath, responseScoreSheetList);
+
+
+                            var subject = new Subject()
+                            {
+                                SubjectId = item.subjectId,
+                                SubjectName = item.subject,
+                                //SubjectDescription = item.SubjectDescription,
+
+                            };
+                            responseSubjectList.Add(subject);
+                            _subjectRepository.Set(userDetailService.subjectPath, responseSubjectList);
+
+
+                            var responseGradeDetail = _gradeRepository.Get(userDetailService.gradePath);
+
+                            var grade = new Grade()
+                            {
+                                GradeId = item.gradeId,
+                                GradeType = item.grade,
+                                //GradeDescription = item.GradeDescription,
+                                //SubjectId = Id
+                            };
+
+                            responseGradeDetail.Add(grade);
+                            _gradeRepository.Set(userDetailService.gradePath, responseGradeDetail);
+
+                        }
+                    }
+                    if (subjectCheck > 0)
+                    {
+                        return new Response<string>
+                        {
+                            StatusMessage = "Subject already added for this students."
+                        };
+                    }
+                    return new Response<string>
+                    {
+                        StatusMessage = "Data added successfully!.."
+                    };
+                }
+
             }
             catch (Exception ex)
             {
@@ -314,7 +384,7 @@ namespace TestProject1.API.Service
                 var responseGradeList = _gradeRepository.Get(userDetailService.gradePath);
                 var responseScoreSheet = _scoresheetRepository.Get(userDetailService.scoresheetPath);
 
-               
+
 
                 if (responseSubjectList == null)
                 {
@@ -325,45 +395,40 @@ namespace TestProject1.API.Service
                 }
                 else
                 {
-                    var result = null;
+                    List<GetMarkSheetDetailDTO> getMarkSheetDetailDTO = new List<GetMarkSheetDetailDTO>();
                     var resUser = (from objScoreSheet in responseScoreSheet
                                    where objScoreSheet.UserId == UserId
-                                   select objScoreSheet).ToList();
-                    foreach (var item1 in resUser)
+                                   select objScoreSheet).FirstOrDefault();
+                    foreach (var item in resUser.markSheetList)
                     {
-                        foreach (var item2 in item1.markSheetList)
+                       var result = (from objSubject in responseSubjectList
+                                      join objScoreSheet in responseScoreSheet on objSubject.SubjectId equals item.subjectId
+                                      join objGrade in responseGradeList on item.gradeId equals objGrade.GradeId
+                                      select new GetMarkSheetDetailDTO()
+                                      {
+                                          subject = objSubject.SubjectName,
+                                          grade = objGrade.GradeType
+                                      }).FirstOrDefault();
+                        if (result == null)
                         {
-                            var result = (from objSubject in responseSubjectList
-                                          join objScoreSheet in responseScoreSheet on objSubject.SubjectId equals item2.subjectId
-                                          join objGrade in responseGradeList on item2.gradeId equals objGrade.GradeId
-                                          where item1.UserId == UserId
-                                          select new GetMarkSheetDetailDTO()
-                                          {
-                                              subject = objSubject.SubjectName,
-                                              grade = objGrade.GradeType
-                                          }).ToList();
-                            if (result.Count == 0)
+                            return new Response<List<GetMarkSheetDetailDTO>>
                             {
-                                return new Response<List<GetMarkSheetDetailDTO>>
-                                {
-                                    StatusMessage = "No recored found!."
-                                };
-                               
-                            }
-                            
+                                StatusMessage = "No recored found!."
+                            };
                         }
-                        return new Response<List<GetMarkSheetDetailDTO>>
-                        {
-                            Result = result,
-                            StatusMessage = "Ok"
-                        };
+                        getMarkSheetDetailDTO.Add(result);
                     }
                     return new Response<List<GetMarkSheetDetailDTO>>
                     {
-                        StatusMessage = "No recored found!."
+                        Result = getMarkSheetDetailDTO,
+                        StatusMessage = "Ok"
                     };
-
                 }
+                //return new Response<List<GetMarkSheetDetailDTO>>
+                //{
+                //    //Result = result,
+                //    StatusMessage = "No recored found!."
+                //};
             }
             catch (Exception ex)
             {
