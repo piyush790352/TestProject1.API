@@ -1,4 +1,5 @@
 ﻿using DemoProject1.API.Model.Domain;
+using TestProject1.API.Model.Domain;
 using TestProject1.API.Model.DTO;
 
 namespace TestProject1.API.IService
@@ -10,5 +11,7 @@ namespace TestProject1.API.IService
         Task<Response<AddUserDetailDTO>> AddUserDetail(AddUserDetailDTO addUserDetailRequestDTO);
         Task<Response<string>> AddMarksheetDetail(AddMarksheetDetailDTO addMarksheetDetailDTO);
         Task<Response<List<GetMarkSheetDetailDTO>>> GetMarksheetList(int UserId);
+        Task<Response<List<Subject>>> GetSubjectList();
+        Task<Response<List<Grade>>> GetGradeList();
     }
 }

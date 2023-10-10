@@ -74,5 +74,27 @@ namespace DemoProject1.API.Controllers
             var response = await _userDetailService.GetMarksheetList(UserId);
             return Ok(response);
         }
+
+        [HttpGet("GetSubjectList")]
+        public async Task<IActionResult> GetSubjectList()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _userDetailService.GetSubjectList();
+            return Ok(response);
+        }
+
+        [HttpGet("GetGradeList")]
+        public async Task<IActionResult> GetGradeList()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _userDetailService.GetGradeList();
+            return Ok(response);
+        }
     }
 }
